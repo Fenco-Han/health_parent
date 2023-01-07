@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.itheima.dao.SetmealDao">
+    <resultMap id="baseResultMap" type="com.itheima.pojo.Setmeal">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
+        <result column="helpCode" property="helpCode"/>
+        <result column="sex" property="sex"/>
+        <result column="age" property="age"/>
+        <result column="price" property="price"/>
+        <result column="remark" property="remark"/>
+        <result column="attention" property="attention"/>
+        <result column="img" property="img"/>
+    </resultMap>
+    <resultMap id="findByIdResultMap" type="com.itheima.pojo.Setmeal" extends="baseResultMap">
+        <collection property="checkGroups" javaType="ArrayList"
+                    ofType="com.itheima.pojo.CheckGroup" column="id"
+                    select="com.itheima.dao.CheckGroupDao.findCheckGroupById">
+        </collection>
+    </resultMap>
+    <!--新增-->
+    <insert id="add" parameterType="com.itheima.pojo.Setmeal">
+        insert into t_setmeal(code, name, sex, helpCode, age, price, remark, attention, img)
+        values (#{code}, #{name}, #{sex}, #{helpCode}, #{age}, #{price}, #{remark}, #{attention}, #{img})
+    </insert>
+    <insert id="setSetmealAndCheckGroup" parameterType="hashmap">
+        insert into t_setmeal_checkgroup(setmeal_id, checkgroup_id)
+        values (#{SetmealId}, #{checkgroupId})
+    </insert>
+    <select id="findByCondition" parameterType="String" resultType="com.itheima.pojo.Setmeal">
+        select * from t_setmeal
+        <if test="value != null and value.length > 0">
+            where code = #{value} or name like '%${value}%' or helpCode = #{value}
+        </if>
+    </select>
+    <select id="findById" parameterType="int" resultMap="findByIdResultMap">
+        select * from t_setmeal
+        where id = #{id}
+    </select>
+    <select id="findAll" parameterType="int" resultType="com.itheima.pojo.Setmeal">
+        select * from t_setmeal
+    </select>
+    <delete id="deleteAssociation" parameterType="int">
+        delete from t_setmeal_checkgroup where setmeal_id = #{id}
+    </delete>
+    <update id="editById" parameterType="com.itheima.pojo.Setmeal">
+        update t_setmeal
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="helpCode != null">
+                helpCode = #{helpCode},
+            </if>
+            <if test="attention != null">
+                attention = #{attention},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="img != null">
+                img = #{img},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>
